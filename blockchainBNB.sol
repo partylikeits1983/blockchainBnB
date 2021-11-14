@@ -44,9 +44,9 @@ contract blockchainBNB {
         // require msg.value to be greater than or equal to price per night
         require (msg.value >= fee);
         
-        properties[msg.sender].paid = true;
+        properties[owner].paid = true;
         
-        properties[msg.sender].available = false;
+        properties[owner].available = false;
         
         owner.transfer(fee);
         

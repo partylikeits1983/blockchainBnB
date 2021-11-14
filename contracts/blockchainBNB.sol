@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
-/// @title Simple DAO smart contract.
+/// @title property listing and rental contract 
 contract blockchainBNB {
     
     struct property {

@@ -16,14 +16,12 @@ contract blockchainBNB {
     address[] public owners;
     
     uint256 private fee;
-    
-    
+      
     
     function listProperty(uint256 perNight) public {
         
         // add owner address to list owners
         owners.push(msg.sender);
-        
         
         // adding values to protery struct
         properties[msg.sender].perNight = perNight;
@@ -32,7 +30,6 @@ contract blockchainBNB {
         
         properties[msg.sender].available = true;
 
-        
     }
     
     
@@ -56,6 +53,3 @@ contract blockchainBNB {
     }
     
 }
-
-
-    

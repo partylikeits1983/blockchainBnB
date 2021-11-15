@@ -17,6 +17,7 @@ contract blockchainBNB {
 
     mapping(address => property) public properties;
     
+    // this list of addresses is for future features - mainly if an owner wants to delete all of their listed properties 
     address[] public owners;
     
     uint256 private fee;
@@ -24,6 +25,18 @@ contract blockchainBNB {
     address private renter;
 
     
+    // future functions:
+
+    // function:  update rental price
+    // struct mapping: owner can have multiple rental properties
+    // function: pay half to reserve, pay in full on arrival 
+    // struct: owners can have ratings
+    // struct: renters can have ratings
+    // function: security deposit
+    // enable payment in ERC20 
+
+
+
     function listProperty(uint256 perNight) public {
         
         // add owner address to list owners
@@ -32,11 +45,10 @@ contract blockchainBNB {
         // adding values to protery struct
         properties[msg.sender].perNight = perNight;
 
-
         // owner address
         properties[msg.sender].owner = msg.sender;
 
-
+        // renter address at listing will be initially set to 0x00 address
         
         properties[msg.sender].paid = false;
         
@@ -50,10 +62,14 @@ contract blockchainBNB {
         renter = msg.sender;
 
         // calculating fee by calling properties mapping
+        // @dev eventually needs to be calculated using block timestamp 
         fee = nights * properties[owner].perNight;
         
         // require msg.value to be greater than or equal to price per night
         require (msg.value >= fee);
+
+        // this is for future features 
+        properties[owner].renter = owner;
 
         properties[owner].renter = msg.sender;
 

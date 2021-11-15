@@ -5,6 +5,10 @@ contract blockchainBNB {
     
     struct property {
         uint256 perNight;
+
+        address owner;
+        address renter;
+
         bool paid;  // if true, that person already voted
         bool available;
 
@@ -17,6 +21,8 @@ contract blockchainBNB {
     
     uint256 private fee;
       
+    address private renter;
+
     
     function listProperty(uint256 perNight) public {
         
@@ -25,6 +31,12 @@ contract blockchainBNB {
         
         // adding values to protery struct
         properties[msg.sender].perNight = perNight;
+
+
+        // owner address
+        properties[msg.sender].owner = msg.sender;
+
+
         
         properties[msg.sender].paid = false;
         
@@ -35,11 +47,16 @@ contract blockchainBNB {
     
     function rentProperty(address payable owner, uint256 nights) public payable returns (uint256) {
         
+        renter = msg.sender;
+
         // calculating fee by calling properties mapping
         fee = nights * properties[owner].perNight;
         
         // require msg.value to be greater than or equal to price per night
         require (msg.value >= fee);
+
+        properties[owner].renter = msg.sender;
+
         
         properties[owner].paid = true;
         

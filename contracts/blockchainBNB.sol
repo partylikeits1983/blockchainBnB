@@ -24,7 +24,7 @@ contract blockchainBNB {
       
     address private renter;
 
-    
+
     // future functions:
 
     // function:  update rental price
@@ -34,7 +34,6 @@ contract blockchainBNB {
     // struct: renters can have ratings
     // function: security deposit
     // enable payment in ERC20 
-
 
 
     function listProperty(uint256 perNight) public {
@@ -73,7 +72,6 @@ contract blockchainBNB {
 
         properties[owner].renter = msg.sender;
 
-        
         properties[owner].paid = true;
         
         properties[owner].available = false;

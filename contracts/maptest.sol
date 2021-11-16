@@ -123,7 +123,6 @@ contract structMap {
     }
     
     
-    
     function addRentalTest(address owner, uint256 id, uint256 t1, uint256 t2) public {
         
         rentals[owner][id].t1.push(t1);

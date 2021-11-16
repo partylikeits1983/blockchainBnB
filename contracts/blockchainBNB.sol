@@ -84,7 +84,7 @@ contract blockchainBNB {
 
 
     uint private ID;
-    function newMap(uint perNight, bool payInFull, uint SD) public {
+    function listProperty(uint perNight, bool payInFull, uint SD) public {
         
         ID = listmapping[msg.sender].length;
         
@@ -92,6 +92,8 @@ contract blockchainBNB {
         properties[msg.sender][ID].id = ID;
         
         properties[msg.sender][ID].perNight = perNight;
+        
+        properties[msg.sender][ID].available = true;
 
         properties[msg.sender][ID].payInFull = payInFull;
         properties[msg.sender][ID].securityDeposit = SD;
@@ -99,7 +101,6 @@ contract blockchainBNB {
         listmapping[msg.sender].push(1);
 
     }
-
 
 
 
@@ -151,11 +152,9 @@ contract blockchainBNB {
 
         securityDeposits[owner][id].timestamp = block.timestamp;
 
-
         owner.transfer(payment);
         
     }
-
 
     function fileDispute(address owner, uint id, bool dispute) public {
 
@@ -163,10 +162,7 @@ contract blockchainBNB {
 
         securityDeposits[msg.sender][id].dispute = dispute;
 
-
     }
-
-
 
     // update price per night 
     function updateRentalPrice(address owner, uint newPrice, uint id) public returns (uint) { 

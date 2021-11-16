@@ -11,32 +11,39 @@ contract structMap {
     }
 
 
-    uint private n;
+    uint256 private i;
+
 
     mapping(address => mapping (uint256 => map1)) public structure1;
 
-    mapping(address => uint256[]) public listmapping;
+    mapping(address => uint256[]) private listmapping;
 
 
-    function setVal(uint256 val1, uint256 val2) public {
+    function setVal(uint256 val1, uint256 val2, uint256 id) public {
+        
+        require(id <= (listmapping[msg.sender].length - 1), "ID not found");
 
-        structure1[msg.sender][0].val1 = val1;
-        structure1[msg.sender][0].val2 = val2;
+        structure1[msg.sender][id].val1 = val1;
+        structure1[msg.sender][id].val2 = val2;
 
+    }
+    
+    
+    function newMap(uint256 val1, uint256 val2) public {
+        
+        i = listmapping[msg.sender].length;
+        
+        structure1[msg.sender][i].val1 = val1;
+        structure1[msg.sender][i].val2 = val2;
+        
+        listmapping[msg.sender].push(1);
 
     }
 
 
-    function addValList(uint256 val1) public {
-
-        listmapping[msg.sender].push(val1);
-
-
-    }
 
     function viewValListLength(address owner) public view returns (uint) {
 
-        
         return listmapping[owner].length;
 
     }

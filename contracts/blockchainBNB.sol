@@ -40,6 +40,8 @@ contract blockchainBNB {
 
         uint amount;
 
+        uint timestamp;
+
     }
 
 
@@ -56,7 +58,7 @@ contract blockchainBNB {
 
 
     // security deposit mapping 
-    mapping(address => mapping (uint => securityDep)) private security;
+    mapping(address => securityDep) private securityDeposits;
 
 
     
@@ -125,7 +127,7 @@ contract blockchainBNB {
 
         securityDeposit = properties[owner][id].securityDeposit;
 
-        
+
         rentals[owner][id].owner = owner;
         rentals[owner][id].id = id;
         
@@ -133,6 +135,20 @@ contract blockchainBNB {
         
         rentals[owner][id].t1.push(t1);
         rentals[owner][id].t2.push(t2);
+
+
+
+        securityDeposits[owner].owner = owner;
+
+        securityDeposits[owner].id = id;
+        securityDeposits[owner].renter = msg.sender;
+
+        securityDeposits[owner].amount += securityDeposit;
+
+        securityDeposits[owner].timestamp += block.timestamp;
+
+
+        owner.transfer(payment);
         
     }
 

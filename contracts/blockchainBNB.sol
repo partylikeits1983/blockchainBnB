@@ -42,6 +42,8 @@ contract blockchainBNB {
 
         uint timestamp;
 
+        bool dispute;
+
     }
 
 
@@ -58,7 +60,7 @@ contract blockchainBNB {
 
 
     // security deposit mapping 
-    mapping(address => securityDep) private securityDeposits;
+    mapping(address => mapping (uint => securityDep)) public securityDeposits;
 
 
     
@@ -138,14 +140,16 @@ contract blockchainBNB {
 
 
 
-        securityDeposits[owner].owner = owner;
+        securityDeposits[owner][id].owner = owner;
 
-        securityDeposits[owner].id = id;
-        securityDeposits[owner].renter = msg.sender;
+        securityDeposits[owner][id].id = id;
+        securityDeposits[owner][id].renter = msg.sender;
 
-        securityDeposits[owner].amount += securityDeposit;
+        securityDeposits[owner][id].amount += securityDeposit;
 
-        securityDeposits[owner].timestamp += block.timestamp;
+        securityDeposits[owner][id].dispute = false;
+
+        securityDeposits[owner][id].timestamp = block.timestamp;
 
 
         owner.transfer(payment);
@@ -153,12 +157,21 @@ contract blockchainBNB {
     }
 
 
+    function fileDispute(address owner, uint id, bool dispute) public {
+
+        require(msg.sender == securityDeposits[owner][id].owner);
+
+        securityDeposits[msg.sender][id].dispute = dispute;
+
+
+    }
+
 
 
     // update price per night 
-    function updateRentalPrice(uint newPrice, uint id) public returns (uint) { 
+    function updateRentalPrice(address owner, uint newPrice, uint id) public returns (uint) { 
         
-        require (msg.sender == properties[msg.sender][id].owner);
+        require (msg.sender == properties[owner][id].owner);
 
         // properties[owner].available = false; 
 

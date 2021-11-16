@@ -12,6 +12,9 @@ contract blockchainBNB {
         bool paid;  // if true, that person already voted
         bool available;
 
+        // pay in full or 50% now 50% on arrival
+        bool payInFull;
+
     }
 
 
@@ -65,10 +68,12 @@ contract blockchainBNB {
         fee = nights * properties[owner].perNight;
         
         // require msg.value to be greater than or equal to price per night
+
+
         require (msg.value >= fee);
 
         // this is for future features 
-        properties[owner].renter = owner;
+        properties[owner].owner = owner;
 
         properties[owner].renter = msg.sender;
 
@@ -82,5 +87,18 @@ contract blockchainBNB {
         
         
     }
-    
+
+
+    function updateRentalPrice(uint256 newPrice) public returns (uint256) { 
+        
+        require (msg.sender == properties[msg.sender].owner);
+
+        properties[msg.sender].perNight = newPrice;
+
+        return newPrice;
+
+    }
+
+
+   
 }

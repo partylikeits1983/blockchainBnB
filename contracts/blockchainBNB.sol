@@ -4,12 +4,15 @@ pragma solidity >=0.7.0 <0.9.0;
 contract blockchainBNB {
     
     struct property {
+        
         uint256 perNight;
 
         address owner;
         address renter;
 
         bool paid;  // if true, that person already voted
+        
+        // will eventually be deleted 
         bool available;
 
         // pay in full or 50% now 50% on arrival

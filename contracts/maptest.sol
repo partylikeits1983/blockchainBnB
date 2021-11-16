@@ -28,7 +28,7 @@ contract structMap {
     
 
 
-    uint256 private i;
+    uint256 private ID;
 
 
     mapping(address => mapping (uint256 => map1)) public structure1;
@@ -53,13 +53,13 @@ contract structMap {
     
     function newMap(uint256 val1, uint256 val2) public {
         
-        i = listmapping[msg.sender].length;
+        ID = listmapping[msg.sender].length;
         
-        structure1[msg.sender][i].owner = msg.sender;
-        structure1[msg.sender][i].id = i;
+        structure1[msg.sender][ID].owner = msg.sender;
+        structure1[msg.sender][ID].id = ID;
         
-        structure1[msg.sender][i].val1 = val1;
-        structure1[msg.sender][i].val2 = val2;
+        structure1[msg.sender][ID].val1 = val1;
+        structure1[msg.sender][ID].val2 = val2;
         
         listmapping[msg.sender].push(1);
 
@@ -92,19 +92,42 @@ contract structMap {
     //// (EndA <= StartB or StartA >= EndB)
     
     
+    uint256 private start;
+    uint256 private end;
+    
+    
     function rent(address owner, uint256 id, uint256 t1, uint256 t2) public {
     
         require(id <= (listmapping[owner].length - 1), "ID not found");
+        
+        for (uint i=0; i<rentals[owner][id].t1.length; i++) {
+            
+            start = rentals[owner][id].t1[i];
+            end = rentals[owner][id].t2[i];
+        
+            require((end <= t1 || start >= t2) == true);
+
+        }
+        
     
         rentals[owner][id].owner = owner;
         rentals[owner][id].id = id;
         
         rentals[owner][id].renter = msg.sender;
         
+        
         rentals[owner][id].t1.push(t1);
         rentals[owner][id].t2.push(t2);
         
 
+    }
+    
+    
+    
+    function addRentalTest(address owner, uint256 id, uint256 t1, uint256 t2) public {
+        
+        rentals[owner][id].t1.push(t1);
+        rentals[owner][id].t2.push(t2);
     }
     
 

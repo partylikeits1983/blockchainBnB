@@ -4,150 +4,149 @@ pragma solidity >=0.7.0 <0.9.0;
 contract blockchainBNB {
     
     struct property {
-        
-        uint256 perNight;
 
         address owner;
-        address renter;
+        uint id;
 
-        bool paid;  // if true, that person already voted
+        uint perNight;
         
-        // will eventually be deleted 
         bool available;
 
         // pay in full or 50% now 50% on arrival
         bool payInFull;
-        uint256 securityDeposit;
+
+        uint securityDeposit;
 
     }
 
-    // still trying to figure out how to have multiple properties per address...
-    struct locations {
-        uint256[] listofproperties;
-
-    }
-
-    struct OWNER_RATINGS {
+    struct rental {
+        
         address owner;
-        uint256 rating;
-        address[] renters;
-    }
-
-    struct RENTER_RATINGS {
+        uint id;
+        
         address renter;
-        uint256 rating;
+
+        uint[] t1;
+        uint[] t2;
+    
+    }
+
+    struct securityDep {
+
+        address owner;
+        uint id;
+
+        address renter;
+
+        uint amount;
+
     }
 
 
-    
-    mapping(address => property) public properties;
+    // property struct mapping 
+    mapping(address => mapping (uint => property)) public properties;
 
 
-    mapping(address=>uint256) security;
+    // rental struct mapping 
+    mapping(address => mapping (uint => rental)) private rentals;
+
+
+    // allows for multiple property listings per address @dev potentially can be optimized
+    mapping(address => uint[]) private listmapping;
+
+
+    // security deposit mapping 
+    mapping(address => mapping (uint => securityDep)) private security;
+
 
     
     // this list of addresses is for future features - mainly if an owner wants to delete all of their listed properties 
     address[] public owners;
     
-    uint256 private fee;
+    uint private fee;
 
-    uint256 private payment;
+    uint private payment;
 
-    uint256 private securityDeposit;
+    uint private securityDeposit;
 
     address private renter;
 
 
     // need to use events instead...
-
     bool private listed;
     bool private rented;
 
 
-    // rating functionality: 
-
-    //mapping(address => OWNER_RATINGS) public ownerRatings;
-
-    //mapping(address => RENTER_RATINGS) public renterRatings;
-
-    //address[] private renters;
 
 
-
-    function listProperty(uint256 perNight, bool payInFull, uint256 SD) public returns (bool) {
+    uint private ID;
+    function newMap(uint perNight, bool payInFull, uint SD) public {
         
-        // add owner address to list owners
-        owners.push(msg.sender);
+        ID = listmapping[msg.sender].length;
         
-        // adding values to protery struct
-        properties[msg.sender].perNight = perNight;
-
-        // owner address
-        properties[msg.sender].owner = msg.sender;
-
-        // renter address at listing will be initially set to 0x00 address
+        properties[msg.sender][ID].owner = msg.sender;
+        properties[msg.sender][ID].id = ID;
         
-        properties[msg.sender].paid = false;
+        properties[msg.sender][ID].perNight = perNight;
+
+        properties[msg.sender][ID].payInFull = payInFull;
+        properties[msg.sender][ID].securityDeposit = SD;
         
-        properties[msg.sender].available = true;
-
-
-        properties[msg.sender].payInFull = payInFull;
-
-        properties[msg.sender].securityDeposit = SD;
-
-        listed = true;
-
-        return listed;
+        listmapping[msg.sender].push(1);
 
     }
+
+
+
+
+    uint256 private start;
+    uint256 private end;
+
+    function rentProperty(address payable owner, uint id, uint nights, uint t1, uint t2) public payable {
     
-    
-    function rentProperty(address payable owner, uint256 nights) public payable returns (uint256, bool) {
+        require(id <= (listmapping[owner].length - 1), "ID not found");
         
-        renter = msg.sender;
+        // there may be a computationally more efficient way of doing this
+        for (uint i=0; i<rentals[owner][id].t1.length; i++) {
+            
+            start = rentals[owner][id].t1[i];
+            end = rentals[owner][id].t2[i];
+        
+            require((end <= t1 || start >= t2) == true);
 
-        // calculating fee by calling properties mapping
-        // @dev eventually needs to be calculated using block timestamp 
-        fee = (nights * properties[owner].perNight) + properties[owner].securityDeposit;
+        }
 
-        payment = nights * properties[owner].perNight;
-
-        securityDeposit = properties[owner].securityDeposit;
-
-
-        // need to add time lock on deposit if there are no disputes 
-        // security deposit can be == 0 
-        security[owner] += securityDeposit;
-
-
-        // require msg.value to be greater than or equal to price per night
         require (msg.value >= fee);
 
-        // this is for future features 
-        properties[owner].owner = owner;
 
-        properties[owner].renter = msg.sender;
+        fee = (nights * properties[owner][id].perNight) + properties[owner][id].securityDeposit;
 
-        properties[owner].paid = true;
+        payment = nights * properties[owner][id].perNight;
+
+        securityDeposit = properties[owner][id].securityDeposit;
+
         
-        properties[owner].available = false;
+        rentals[owner][id].owner = owner;
+        rentals[owner][id].id = id;
         
-        owner.transfer(payment);
-
-        rented = true;
-
-        return (fee, rented);
+        rentals[owner][id].renter = msg.sender;
+        
+        rentals[owner][id].t1.push(t1);
+        rentals[owner][id].t2.push(t2);
         
     }
+
+
 
 
     // update price per night 
-    function updateRentalPrice(uint256 newPrice) public returns (uint256) { 
+    function updateRentalPrice(uint newPrice, uint id) public returns (uint) { 
         
-        require (msg.sender == properties[msg.sender].owner);
+        require (msg.sender == properties[msg.sender][id].owner);
 
-        properties[msg.sender].perNight = newPrice;
+        // properties[owner].available = false; 
+
+        properties[msg.sender][id].perNight = newPrice;
 
         return newPrice;
 

@@ -88,17 +88,18 @@ contract structMap {
         
     
     
-    //// (EndA <= StartB or StartA >= EndB)
+    //// (EndA <= StartB or StartA >= EndB) https://www.soliantconsulting.com/blog/determining-two-date-ranges-overlap/
     
     
     uint256 private start;
     uint256 private end;
     
-    
+
     function rent(address owner, uint256 id, uint256 t1, uint256 t2) public {
     
         require(id <= (listmapping[owner].length - 1), "ID not found");
         
+        // there may be a computationally more efficient way of doing this
         for (uint i=0; i<rentals[owner][id].t1.length; i++) {
             
             start = rentals[owner][id].t1[i];

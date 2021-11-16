@@ -21,8 +21,8 @@ contract structMap {
         
         address renter;
 
-        uint256 t1;
-        uint256 t2;
+        uint256[] t1;
+        uint256[] t2;
     
     }
     
@@ -37,7 +37,7 @@ contract structMap {
     mapping(address => uint256[]) private listmapping;
     
     
-    mapping(address => mapping (uint256 => map2)) public rentals;
+    mapping(address => mapping (uint256 => map2)) private rentals;
     
 
 
@@ -80,9 +80,16 @@ contract structMap {
     }
     
     
+    function viewRentals(address owner, uint256 id, uint256 t1, uint256 t2) public view returns (uint256, uint256) {
+    
+            return (rentals[owner][id].t1[t1], rentals[owner][id].t2[t2]);
+            
+    }
+
+        
     
     
-    ////
+    //// (EndA <= StartB or StartA >= EndB)
     
     
     function rent(address owner, uint256 id, uint256 t1, uint256 t2) public {
@@ -94,8 +101,8 @@ contract structMap {
         
         rentals[owner][id].renter = msg.sender;
         
-        rentals[owner][id].t1 = t1;
-        rentals[owner][id].t2 = t2;
+        rentals[owner][id].t1.push(t1);
+        rentals[owner][id].t2.push(t2);
         
 
     }

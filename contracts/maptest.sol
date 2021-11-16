@@ -27,7 +27,6 @@ contract structMap {
     }
     
 
-
     uint256 private ID;
 
 
@@ -115,11 +114,9 @@ contract structMap {
         
         rentals[owner][id].renter = msg.sender;
         
-        
         rentals[owner][id].t1.push(t1);
         rentals[owner][id].t2.push(t2);
         
-
     }
     
     
@@ -129,6 +126,5 @@ contract structMap {
         rentals[owner][id].t2.push(t2);
     }
     
-
 
 }

@@ -212,15 +212,15 @@ contract blockchainBNB {
         require(msg.sender == securityDeposits[owner][id].owner || msg.sender == securityDeposits[owner][id].renter);
         
         // release after a week 
-        require(securityDeposits[owner][id].timestamp + 604800 < block.timestamp);
-
+        require(securityDeposits[owner][id].timestamp + 604800 < block.timestamp, "Deposit still on hold");
+        require(securityDeposits[owner][id].dispute == false, "Owner has filed a dispute");
+   
         amount = securityDeposits[owner][id].amount;
         
         user.transfer(amount);
         
         
     }
-
 
 
      function Time_call() public view returns (uint256){

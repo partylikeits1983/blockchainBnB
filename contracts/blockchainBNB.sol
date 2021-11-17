@@ -8,16 +8,20 @@ contract blockchainBNB {
         address owner;
         uint id;
 
+        // price per night 
         uint perNight;
         
+        // owner can pause new rentals 
         bool available;
 
         // pay in full or 50% now 50% on arrival
+        // functionality not yet built in
         bool payInFull;
 
+        // security Deposit 
         uint securityDeposit;
 
-
+        // array of all rentals 
         uint[] t1;
         uint[] t2;
 
@@ -30,6 +34,7 @@ contract blockchainBNB {
         
         address renter;
 
+        // check in check out time of renter
         uint t1;
         uint t2;
     
@@ -42,10 +47,13 @@ contract blockchainBNB {
 
         address renter;
 
+        // renter will be able to withdraw after certain amount of time 
         uint amount;
 
+        // this will be used to release after x number of days 
         uint timestamp;
 
+        // default is false
         bool dispute;
 
     }
@@ -80,12 +88,6 @@ contract blockchainBNB {
     address private renter;
 
 
-    // need to use events instead...
-    bool private listed;
-    bool private rented;
-
-
-
 
     uint private ID;
     function listProperty(uint perNight, bool payInFull, uint SD) public {
@@ -118,7 +120,7 @@ contract blockchainBNB {
         require(id <= (listmapping[owner].length - 1), "ID not found");
 
         
-        // there may be a computationally more efficient way of doing this
+        // for loop to check if rental dates overlap with other renters 
         for (uint i=0; i<properties[owner][id].t1.length; i++) {
             
             start = properties[owner][id].t1[i];
@@ -130,7 +132,7 @@ contract blockchainBNB {
 
         require (msg.value >= fee);
 
-
+        // currently will not work if duration is < 86400 seconds 
 
         duration = (t2 - t1);
 
@@ -192,7 +194,7 @@ contract blockchainBNB {
     }
 
 
-
+    // in future members of DAO can vote to resolve dispute 
     function fileDispute(address owner, uint id, bool dispute) public {
 
         require(msg.sender == securityDeposits[owner][id].owner);

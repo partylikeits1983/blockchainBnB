@@ -149,6 +149,9 @@ contract blockchainBNB {
         
         rentals[owner][id].renter = msg.sender;
 
+        rentals[owner][id].t1 = t1;
+        rentals[owner][id].t2 = t2;
+
 
         // push check in and check out to properties struct 
         

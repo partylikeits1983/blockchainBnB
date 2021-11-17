@@ -68,19 +68,14 @@ contract blockchainBNB {
 
 
     // allows for multiple property listings per address @dev potentially can be optimized
-    mapping(address => uint[]) private listmapping;
+    mapping(address => uint[]) private listmappingOwner;
+    mapping(address => uint[]) private listmappingRenter;
 
 
     // security deposit mapping 
     mapping(address => mapping (uint => securityDep)) public securityDeposits;
 
 
-    
-    
-  
-
-    // also used by releaseDeposit
-    //address private renter;
 
 
     // used by listProperty and rentProperty
@@ -88,7 +83,7 @@ contract blockchainBNB {
     
     function listProperty(uint perNight, bool payInFull, uint securityDeposit) public {
         
-        ID = listmapping[msg.sender].length;
+        ID = listmappingOwner[msg.sender].length;
         
         properties[msg.sender][ID].owner = msg.sender;
         properties[msg.sender][ID].id = ID;
@@ -100,7 +95,7 @@ contract blockchainBNB {
         properties[msg.sender][ID].payInFull = payInFull;
         properties[msg.sender][ID].securityDeposit = securityDeposit;
         
-        listmapping[msg.sender].push(1);
+        listmappingOwner[msg.sender].push(ID);
 
     }
 
@@ -125,7 +120,7 @@ contract blockchainBNB {
         uint securityDeposit;
         
     
-        require(id <= (listmapping[owner].length - 1), "ID not found");
+        require(id <= (listmappingOwner[owner].length - 1), "ID not found");
 
         duration = (t2 - t1);
         
@@ -163,7 +158,7 @@ contract blockchainBNB {
         // ID is of renter rentals 
 
         // push to rentals struct 
-        ID = listmapping[msg.sender].length;
+        ID = listmappingRenter[msg.sender].length;
 
         rentals[msg.sender][ID].owner = owner;
         rentals[msg.sender][ID].id = id;
@@ -187,6 +182,9 @@ contract blockchainBNB {
         securityDeposits[msg.sender][ID].amount += securityDeposit;
         securityDeposits[msg.sender][ID].dispute = false;
         securityDeposits[msg.sender][ID].timestamp = block.timestamp;
+
+
+        listmappingRenter[msg.sender].push(ID);
 
         owner.transfer(payment);
         

@@ -47,7 +47,7 @@ contract blockchainBNB {
 
         address renter;
 
-        // renter will be able to withdraw after certain amount of time 
+        // renter will be able to withdraw deposit after certain amount of time 
         uint amount;
 
         // this will be used to release after x number of days 
@@ -76,8 +76,6 @@ contract blockchainBNB {
 
 
     
-    // this list of addresses is for future features - mainly if an owner wants to delete all of their listed properties 
-    address[] public owners;
     
     uint private fee;
 
@@ -85,11 +83,13 @@ contract blockchainBNB {
 
     uint private securityDeposit;
 
+    // also used by releaseDeposit
     address private renter;
 
 
 
     uint private ID;
+    
     function listProperty(uint perNight, bool payInFull, uint SD) public {
         
         ID = listmapping[msg.sender].length;
@@ -201,6 +201,24 @@ contract blockchainBNB {
 
         securityDeposits[msg.sender][id].dispute = dispute;
 
+    }
+    
+    
+    uint private amount;
+    
+    // user is renter
+    function releaseDeposit(address owner, uint id, address payable user) public {
+        
+        require(msg.sender == securityDeposits[owner][id].owner || msg.sender == securityDeposits[owner][id].renter);
+        
+        // release after a week 
+        require(securityDeposits[owner][id].timestamp + 604800 < block.timestamp);
+
+        amount = securityDeposits[owner][id].amount;
+        
+        user.transfer(amount);
+        
+        
     }
 
 

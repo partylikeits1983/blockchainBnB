@@ -17,6 +17,10 @@ contract blockchainBNB {
 
         uint securityDeposit;
 
+
+        uint[] t1;
+        uint[] t2;
+
     }
 
     struct rental {
@@ -26,8 +30,8 @@ contract blockchainBNB {
         
         address renter;
 
-        uint[] t1;
-        uint[] t2;
+        uint t1;
+        uint t2;
     
     }
 
@@ -115,10 +119,10 @@ contract blockchainBNB {
 
         
         // there may be a computationally more efficient way of doing this
-        for (uint i=0; i<rentals[owner][id].t1.length; i++) {
+        for (uint i=0; i<properties[owner][id].t1.length; i++) {
             
-            start = rentals[owner][id].t1[i];
-            end = rentals[owner][id].t2[i];
+            start = properties[owner][id].t1[i];
+            end = properties[owner][id].t2[i];
         
             require((end <= t1 || start >= t2) == true);
 
@@ -127,15 +131,10 @@ contract blockchainBNB {
         require (msg.value >= fee);
 
 
-        // fee = (nights * properties[owner][id].perNight) + properties[owner][id].securityDeposit;
-
-        // payment = nights * properties[owner][id].perNight;
-
-        securityDeposit = properties[owner][id].securityDeposit;
-
-
 
         duration = (t2 - t1);
+
+        securityDeposit = properties[owner][id].securityDeposit;
 
         fee = (duration * properties[owner][id].perNight) / 86400 + properties[owner][id].securityDeposit;
 
@@ -143,25 +142,22 @@ contract blockchainBNB {
 
 
 
-
+        // push to rental struct 
 
         rentals[owner][id].owner = owner;
         rentals[owner][id].id = id;
         
         rentals[owner][id].renter = msg.sender;
+
+
+        // push check in and check out to properties struct 
         
-        rentals[owner][id].t1.push(t1);
-        rentals[owner][id].t2.push(t2);
+        properties[owner][id].t1.push(t1);
+        properties[owner][id].t2.push(t2);
 
 
+        // security Deposit struct 
 
-
-
-
-
-
-
-        // security Deposit
         securityDeposits[owner][id].owner = owner;
 
         securityDeposits[owner][id].id = id;

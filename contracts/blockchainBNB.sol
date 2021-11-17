@@ -176,13 +176,7 @@ contract blockchainBNB {
         
     }
 
-    function fileDispute(address owner, uint id, bool dispute) public {
 
-        require(msg.sender == securityDeposits[owner][id].owner);
-
-        securityDeposits[msg.sender][id].dispute = dispute;
-
-    }
 
     // update price per night 
     function updateRentalPrice(address owner, uint newPrice, uint id) public returns (uint) { 
@@ -194,6 +188,16 @@ contract blockchainBNB {
         properties[msg.sender][id].perNight = newPrice;
 
         return newPrice;
+
+    }
+
+
+
+    function fileDispute(address owner, uint id, bool dispute) public {
+
+        require(msg.sender == securityDeposits[owner][id].owner);
+
+        securityDeposits[msg.sender][id].dispute = dispute;
 
     }
 

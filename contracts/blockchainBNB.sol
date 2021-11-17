@@ -87,7 +87,7 @@ contract blockchainBNB {
     address private renter;
 
 
-
+    // used by listProperty and rentProperty
     uint private ID;
     
     function listProperty(uint perNight, bool payInFull, uint SD) public {
@@ -115,9 +115,21 @@ contract blockchainBNB {
 
     uint private duration;
 
+
+    // handle multiple rentals per renter 
+    mapping (address => uint[]) private previousRentals;
+
+
     function rentProperty(address payable owner, uint id, uint t1, uint t2) public payable {
     
         require(id <= (listmapping[owner].length - 1), "ID not found");
+
+
+        duration = (t2 - t1);
+        
+        // renters should be able to rent a property for a few hours if they wish
+        require(duration <= 86400);
+
 
         
         // for loop to check if rental dates overlap with other renters 
@@ -133,8 +145,9 @@ contract blockchainBNB {
         require (msg.value >= fee);
 
         // currently will not work if duration is < 86400 seconds 
+        
 
-        duration = (t2 - t1);
+
 
         securityDeposit = properties[owner][id].securityDeposit;
 
@@ -145,14 +158,24 @@ contract blockchainBNB {
 
 
         // push to rental struct 
+        // rental struct is mapped to renter address not owner address 
 
-        rentals[owner][id].owner = owner;
-        rentals[owner][id].id = id;
+
+        // renter cannot currently have multiple rentals....
+
+        // create array of rentals of address.... 
+        // map renter address to array 
+        // check length of that array ++ 
+
+        ID = listmapping[msg.sender].length;
+
+        rentals[msg.sender][ID].owner = owner;
+        rentals[msg.sender][ID].id = id;
         
-        rentals[owner][id].renter = msg.sender;
+        rentals[msg.sender][ID].renter = msg.sender;
 
-        rentals[owner][id].t1 = t1;
-        rentals[owner][id].t2 = t2;
+        rentals[msg.sender][ID].t1 = t1;
+        rentals[msg.sender][ID].t2 = t2;
 
 
         // push check in and check out to properties struct 

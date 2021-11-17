@@ -77,20 +77,16 @@ contract blockchainBNB {
 
     
     
-    uint private fee;
-
-    uint private payment;
-
-    uint private securityDeposit;
+  
 
     // also used by releaseDeposit
-    address private renter;
+    //address private renter;
 
 
     // used by listProperty and rentProperty
     uint private ID;
     
-    function listProperty(uint perNight, bool payInFull, uint SD) public {
+    function listProperty(uint perNight, bool payInFull, uint securityDeposit) public {
         
         ID = listmapping[msg.sender].length;
         
@@ -102,7 +98,7 @@ contract blockchainBNB {
         properties[msg.sender][ID].available = true;
 
         properties[msg.sender][ID].payInFull = payInFull;
-        properties[msg.sender][ID].securityDeposit = SD;
+        properties[msg.sender][ID].securityDeposit = securityDeposit;
         
         listmapping[msg.sender].push(1);
 
@@ -110,10 +106,7 @@ contract blockchainBNB {
 
 
 
-    uint256 private start;
-    uint256 private end;
 
-    uint private duration;
 
 
     // handle multiple rentals per renter 
@@ -121,9 +114,18 @@ contract blockchainBNB {
 
 
     function rentProperty(address payable owner, uint id, uint t1, uint t2) public payable {
+        
+        uint start;
+        uint end;
+        uint duration;
+        
+        
+        uint fee;
+        uint payment;
+        uint securityDeposit;
+        
     
         require(id <= (listmapping[owner].length - 1), "ID not found");
-
 
         duration = (t2 - t1);
         
@@ -142,12 +144,7 @@ contract blockchainBNB {
 
         }
 
-        require (msg.value >= fee);
-
         // currently will not work if duration is < 86400 seconds 
-        
-
-
 
         securityDeposit = properties[owner][id].securityDeposit;
 
@@ -156,17 +153,16 @@ contract blockchainBNB {
         payment = (duration * properties[owner][id].perNight) / 86400;
 
 
-
-        // push to rental struct 
-        // rental struct is mapped to renter address not owner address 
+        require (msg.value >= fee);
 
 
-        // renter cannot currently have multiple rentals....
 
-        // create array of rentals of address.... 
-        // map renter address to array 
-        // check length of that array ++ 
+        // rental and security deposits struct is mapped to renter address not owner address 
 
+        // id is of owner properties 
+        // ID is of renter rentals 
+
+        // push to rentals struct 
         ID = listmapping[msg.sender].length;
 
         rentals[msg.sender][ID].owner = owner;
@@ -179,23 +175,18 @@ contract blockchainBNB {
 
 
         // push check in and check out to properties struct 
-        
         properties[owner][id].t1.push(t1);
         properties[owner][id].t2.push(t2);
 
 
         // security Deposit struct 
 
-        securityDeposits[owner][id].owner = owner;
-
-        securityDeposits[owner][id].id = id;
-        securityDeposits[owner][id].renter = msg.sender;
-
-        securityDeposits[owner][id].amount += securityDeposit;
-
-        securityDeposits[owner][id].dispute = false;
-
-        securityDeposits[owner][id].timestamp = block.timestamp;
+        securityDeposits[msg.sender][ID].owner = owner;
+        securityDeposits[msg.sender][ID].id = id;
+        securityDeposits[msg.sender][ID].renter = msg.sender;
+        securityDeposits[msg.sender][ID].amount += securityDeposit;
+        securityDeposits[msg.sender][ID].dispute = false;
+        securityDeposits[msg.sender][ID].timestamp = block.timestamp;
 
         owner.transfer(payment);
         
@@ -204,17 +195,21 @@ contract blockchainBNB {
 
 
     // update price per night 
-    function updateRentalPrice(address owner, uint newPrice, uint id) public returns (uint) { 
-        
-        require (msg.sender == properties[owner][id].owner);
-
-        // properties[owner].available = false; 
+    function updateRentalPrice(uint newPrice, uint id) public returns (uint) { 
 
         properties[msg.sender][id].perNight = newPrice;
 
         return newPrice;
 
     }
+
+
+    function propertyAvailability(uint id, bool available) public {
+
+        properties[msg.sender][id].available = available;
+
+    }
+
 
 
     // in future members of DAO can vote to resolve dispute 
@@ -227,20 +222,22 @@ contract blockchainBNB {
     }
     
     
-    uint private amount;
+    
     
     // user is renter
-    function releaseDeposit(address owner, uint id, address payable user) public {
+    function releaseDeposit(address payable renter, uint id) public {
+
+        uint amount;
         
-        require(msg.sender == securityDeposits[owner][id].owner || msg.sender == securityDeposits[owner][id].renter);
+        require(msg.sender == securityDeposits[renter][id].owner || msg.sender == securityDeposits[renter][id].renter);
         
         // release after a week 
-        require(securityDeposits[owner][id].timestamp + 604800 < block.timestamp, "Deposit still on hold");
-        require(securityDeposits[owner][id].dispute == false, "Owner has filed a dispute");
+        require(securityDeposits[renter][id].timestamp + 604800 < block.timestamp, "Deposit still on hold");
+        require(securityDeposits[renter][id].dispute == false, "Owner has filed a dispute");
    
-        amount = securityDeposits[owner][id].amount;
+        amount = securityDeposits[renter][id].amount;
         
-        user.transfer(amount);
+        renter.transfer(amount);
         
         
     }

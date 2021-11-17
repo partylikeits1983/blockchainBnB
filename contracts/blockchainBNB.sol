@@ -52,7 +52,7 @@ contract blockchainBNB {
 
 
     // rental struct mapping 
-    mapping(address => mapping (uint => rental)) private rentals;
+    mapping(address => mapping (uint => rental)) public rentals;
 
 
     // allows for multiple property listings per address @dev potentially can be optimized
@@ -107,9 +107,12 @@ contract blockchainBNB {
     uint256 private start;
     uint256 private end;
 
-    function rentProperty(address payable owner, uint id, uint nights, uint t1, uint t2) public payable {
+    uint private duration;
+
+    function rentProperty(address payable owner, uint id, uint t1, uint t2) public payable {
     
         require(id <= (listmapping[owner].length - 1), "ID not found");
+
         
         // there may be a computationally more efficient way of doing this
         for (uint i=0; i<rentals[owner][id].t1.length; i++) {
@@ -124,11 +127,22 @@ contract blockchainBNB {
         require (msg.value >= fee);
 
 
-        fee = (nights * properties[owner][id].perNight) + properties[owner][id].securityDeposit;
+        // fee = (nights * properties[owner][id].perNight) + properties[owner][id].securityDeposit;
 
-        payment = nights * properties[owner][id].perNight;
+        // payment = nights * properties[owner][id].perNight;
 
         securityDeposit = properties[owner][id].securityDeposit;
+
+
+
+        duration = (t2 - t1);
+
+        fee = (duration * properties[owner][id].perNight) / 86400 + properties[owner][id].securityDeposit;
+
+        payment = (duration * properties[owner][id].perNight) / 86400;
+
+
+
 
 
         rentals[owner][id].owner = owner;
@@ -141,6 +155,13 @@ contract blockchainBNB {
 
 
 
+
+
+
+
+
+
+        // security Deposit
         securityDeposits[owner][id].owner = owner;
 
         securityDeposits[owner][id].id = id;
@@ -176,5 +197,12 @@ contract blockchainBNB {
         return newPrice;
 
     }
+
+
+
+     function Time_call() public view returns (uint256){
+        return block.timestamp; 
+    }
+    
 
 }

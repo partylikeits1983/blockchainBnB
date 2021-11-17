@@ -77,6 +77,17 @@ contract blockchainBNB {
 
 
 
+    // event handlers 
+    
+    event PropertyListed(address owner, uint ID);
+    event PropertyRented(address owner, uint ID, address renter, uint checkin, uint checkout);
+    event PriceUpdated(address owner, uint newPrice, uint ID);
+
+        
+
+
+
+
 
     // used by listProperty and rentProperty
     uint private ID;
@@ -96,6 +107,8 @@ contract blockchainBNB {
         properties[msg.sender][ID].securityDeposit = securityDeposit;
         
         listmappingOwner[msg.sender].push(ID);
+        
+        emit PropertyListed(msg.sender, ID);
 
     }
 
@@ -188,21 +201,25 @@ contract blockchainBNB {
 
         owner.transfer(payment);
         
+        emit PropertyRented(owner, id, msg.sender, t1, t2);
+        
+
+        
     }
 
 
 
     // update price per night 
-    function updateRentalPrice(uint newPrice, uint id) public returns (uint) { 
+    function updateRentalPrice(uint newPrice, uint id) public { 
 
         properties[msg.sender][id].perNight = newPrice;
-
-        return newPrice;
+        
+        emit PriceUpdated(msg.sender, newPrice, id);
 
     }
 
 
-    function propertyAvailability(uint id, bool available) public {
+    function UpdatePropertyAvailability(uint id, bool available) public {
 
         properties[msg.sender][id].available = available;
 
